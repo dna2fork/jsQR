@@ -72,7 +72,7 @@ function jsQR(data: Uint8ClampedArray, width: number, height: number, providedOp
 
   const shouldInvert = options.inversionAttempts === "attemptBoth" || options.inversionAttempts === "invertFirst";
   const tryInvertedFirst = options.inversionAttempts === "onlyInvert" || options.inversionAttempts === "invertFirst";
-  const {binarized, inverted} = binarize(data, width, height, shouldInvert);
+  const {binarized, inverted} = binarize(data, width, height, shouldInvert, options);
   let result = scan(tryInvertedFirst ? inverted : binarized);
   if (!result && (options.inversionAttempts === "attemptBoth" || options.inversionAttempts === "invertFirst")) {
     result = scan(tryInvertedFirst ? binarized : inverted);

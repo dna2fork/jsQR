@@ -23,10 +23,17 @@ class Matrix {
   }
 }
 
-export function binarize(data: Uint8ClampedArray, width: number, height: number, returnInverted: boolean) {
+export function binarize(data: Uint8ClampedArray, width: number, height: number, returnInverted: boolean, options: any = null) {
   if (data.length !== width * height * 4) {
     throw new Error("Malformed data passed to binarizer.");
   }
+
+  if (!options) options = {};
+  options.greyFn = (
+    options.greyFn ||
+    (r: number, g: number, b: number) => 0.2126 * r + 0.7152 * g + 0.0722 * b
+  );
+
   // Convert image to greyscale
   const greyscalePixels = new Matrix(width, height);
   for (let x = 0; x < width; x++) {
@@ -116,8 +123,34 @@ export function binarize(data: Uint8ClampedArray, width: number, height: number,
       }
     }
   }
-  if (returnInverted) {
-    return { binarized, inverted };
-  }
-  return { binarized };
+
+  let ret = {};
+  ret.binarized = binarized;
+  if (returnInverted) { ret.inverted = inverted; }
+  return ret;
 }
+
+/*
+function debugVis(mat: Matrix, valMapFn: any) {
+   var w = mat.width;
+   var h = mat.height || (~~(mat.data.length/w));
+   var bb = document.createElement('canvas');
+   var bp = bb.getContext('2d');
+   var dd = [];
+   for (var yy = 0; yy < h; yy++)
+      for (var xx = 0; xx < w; xx++) {
+         var px = valMapFn?valMapFn(mat.get(xx, yy)):mat.get(xx, yy);
+        dd.push(px); dd.push(px); dd.push(px); dd.push(255);
+      }
+   bb.width = w;
+   bb.height = h;
+   bb.style.width = w + 'px';
+   bb.style.height = h + 'px';
+   var pp = new ImageData(new Uint8ClampedArray(dd), w, h);
+   bp.putImageData(pp, 0, 0);
+   document.body.appendChild(bb);
+   // e.g. debugVis(binarized, (x) => x?255:0);
+   // v-- set break point here to see middle-result
+   document.body.removeChild(bb);
+}
+*/
